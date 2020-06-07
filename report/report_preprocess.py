@@ -41,7 +41,7 @@ def load_report(data_path,sheet_name):
         #if i>=3845:
             #print(finding)
             #print('\n')
-        reports_list.append(finding)
+        reports_list.append(finding.split())
     return reports_list
 
 def found_word(dct,num,word):
@@ -71,4 +71,17 @@ def make_dct(lst):
                 dct[key] = word
     return dct
 
-# lst = load_report('/data/unagi0/kizawa/IU_X_ray/indiana_reports.xls')
+def save_obj(obj,path):
+    with open(path,mode='wb') as f:
+        pickle.dump(obj,f)
+
+def load_obj(path):
+    with open(path,mode='rb') as f:
+        data = pickle.load(f)
+        return data
+
+if __name__ == '__main__':
+    lst = load_report('/data/unagi0/kizawa/IU_X_ray/indiana_reports.xls','indiana_reports')
+    dct = make_dct(lst)
+    save_obj(lst,'./data/lst.pickle')
+    save_obj(lst,'./data/dct.pickle')
