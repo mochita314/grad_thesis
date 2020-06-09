@@ -1,5 +1,4 @@
 # the code for proceccing reports
-# got inspiration from 'Deep Fragment Embeddings for Bidrectional Image Sentence Mapping [Karpathy+ NeurIPS2014]'
 
 import xlrd
 import pickle
@@ -114,8 +113,8 @@ def load_obj(path):
 if __name__ == '__main__':
     lst = load_report('/data/unagi0/kizawa/IU_X_ray/indiana_reports.xls','indiana_reports')
     dct = make_dct(lst)
-    cnt = 0
     '''
+    cnt = 0
     for key in dct:
         if cnt < 200:
             print(dct[key])
