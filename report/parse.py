@@ -39,4 +39,54 @@ def parse_reports(data_path,sheet_name,file_path):
                     f.write('error!!!')
                     f.write('\n')
 
-parse_reports('/data/unagi0/kizawa/IU_X_ray/indiana_reports.xls','indiana_reports','data/med_parsed.txt')
+def record_type(file_path,txt_path):
+
+    type_dct = {}
+
+    f = open(file_path)
+    lines = f.readlines()
+
+    #cnt = 0
+    for line in lines:
+        #cnt += 1
+        #if cnt > 200:
+            #break
+        lst = [i for i in line.split()]
+        for j in range(len(lst)):
+            value = lst[j]
+            if 'deprel=' in value:
+                value = value[8:-2]
+                if type_dct.get(value) == None:
+                    type_dct[value] = 1
+    
+    with open(txt_path,mode='a') as f:
+        for key in type_dct:
+            f.write(str(key))
+            f.write('\n')
+                 
+    return type_dct
+
+def missing_record(file_path):
+
+    f = open(file_path)
+    lines = f.readlines()
+
+    missing = []
+    pre_lst = [0]
+
+    for line in lines:
+        lst = [i for i in line.split()]
+        if lst[0] == 'finding':
+            if pre_lst[0] == 'finding':
+                num = int(pre_lst[1][3:])
+                missing.append(num)
+        pre_lst = lst
+
+    return missing
+
+if __name__ == '__main__':
+
+    #parse_reports('/data/unagi0/kizawa/IU_X_ray/indiana_reports.xls','indiana_reports','data/med_parsed.txt')
+    type_dct = record_type('data/med_parsed.txt','data/dependency_type.txt')
+    missing = missing_record('data/med_parsed.txt')
+    print(missing)

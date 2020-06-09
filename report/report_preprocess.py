@@ -123,4 +123,4 @@ if __name__ == '__main__':
         cnt += 1
     '''
     save_obj(lst,'./data/lst.pickle')
-    save_obj(lst,'./data/dct.pickle')
+    save_obj(dct,'./data/dct.pickle')
