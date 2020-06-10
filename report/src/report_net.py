@@ -5,8 +5,9 @@ from report_preprocess import *
 
 class Report2vec:
 
-    def __init__(self):
+    def __init__(self,name):
 
+        self.name = name
         self.file_path = 'data/med_parsed.txt'
         self.type_path = 'data/dependency_type.txt'
         self.w2i = {}
@@ -31,11 +32,11 @@ class Report2vec:
                     self.findings[cnt-1] = finding
                     finding = []
             else:
-                finding.append(line)
+                finding.append(list(l for l in line.split()))
 
     def word2id(self):
 
-        id = 1
+        ID = 1
 
         for key in self.finding:
             finding = self.findings[key]
@@ -43,19 +44,19 @@ class Report2vec:
                 if 'Token' in finding[j]:
                     word = finding[j][1][6:-1]
                     if self.w2i.get(word) == None:
-                        self.w2i[word] = id
-                        id += 1
+                        self.w2i[word] = ID
+                        ID += 1
         
-        self.w2i['unknown_word'] = id
+        self.w2i['unknown_word'] = ID
         self.i2w = {i: w for w, i in self.w2i.items()}
 
         self.vocabulary_size = len(self.w2i)
     
     def word2vec(self,word):
 
-        id = self.w2i[word]
+        ID = self.w2i[word]
         vec = [0 for _ in range(self.vocabulary_size)]
-        vec[id] = 1
+        vec[ID] = 1
 
         return vec
     
@@ -65,12 +66,27 @@ class Report2vec:
             finding = self.findings[key]
             for i in range(len(finding)):
                 cnt = 0
+                NN_with = {}
+                with_NN = {}
                 if 'sentence' in finding[i]:
                     cnt += 1
-                    lst.append(finding[i])
-
-                    
-
+                    if cnt > 1:
+                        NN_with = {}
+                        with_NN = {}
+                elif 'Token' in finding[i]:
+                    index = finding[i][0][-1]
+                    pos = finding[i][3][5:-1]
+                    word = finding[i][1][6:-1]
+                    head = finding[i][4][-1]
+                    R = finding[i][5][8:-2]
+                    if pos == 'NN':
+                        NN_with[word] = [finding[head][1][6:-1],R]
+                    elif finding[head][3][5:-1] == 'NN':
+                        with_NN[word] = [finding[head][1][6:-1],R]
+                    else:
+                        pass
+                else:
+                    pass
 
         return vec
 
@@ -87,6 +103,6 @@ class MyDataset(torch.utils.data.Dataset):
 
 if __name__ == '__main__':
 
-    #word_dct = load_obj('data/dct.pickle')
-    #findings = separate_each_finding('data/med_parsed.txt')
-    #save_obj(findings,'data/finding.pickle')
+    word_dct = load_obj('data/dct.pickle')
+    findings = separate_each_finding('data/med_parsed.txt')
+    save_obj(findings,'data/finding.pickle')
