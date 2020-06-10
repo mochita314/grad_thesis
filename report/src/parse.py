@@ -7,8 +7,7 @@ import xlrd
 nltk.download('punkt')
 
 def parse_reports(data_path,sheet_name,file_path):
-    '''
-    '''
+
     report_data_file = xlrd.open_workbook(data_path)
     sheet = report_data_file.sheet_by_name(sheet_name)
 
