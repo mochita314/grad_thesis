@@ -67,21 +67,23 @@ class Report2vec:
     
     def finding2vec(self):
 
-        vec = []
+        vec = [[] for _ in range(len(self.findings))]
         f_vec = []
         sent = []
 
         for key in self.findings:
-            print(key)
+
+            print('key:',key)
 
             finding = self.findings[key]
             stored = 0
 
             for i in range(len(finding)):
-
+                
                 print('finding[i]:',finding[i])
 
                 if 'sentence' in finding[i][0]:
+                    print('sentence found')
 
                     if sent != []:
                         stored = i
@@ -89,6 +91,7 @@ class Report2vec:
                         sent = []
 
                 elif 'Token' in finding[i][0]:
+                    print('Token found')
                     index = int(finding[i][0][-2])
                     #print('index:',index)
                     pos = finding[i][3][5:-2]
@@ -100,42 +103,44 @@ class Report2vec:
                     R = finding[i][5][8:-2]
                     #print('R:',R)
 
-                    '''
-                    if head != 0:
-                        print('head:',finding[head])
-                        print('head pos:',finding[head][3])
-                        print('head pos head:',finding[head][3][5])
-                    '''
-
-                    if pos == 'NN':
+                    if pos == 'NN' or pos == 'NNS':
+                        print('this is NN')
                         ID = self.w2i[word]
+
                         if 'sentence' in finding[head][0]:
                             with_id = self.w2i['root_id']
-                        else:                           
+                        else:        
                             with_id = self.w2i[finding[head][1][6:-2]]
-                        sent.append([ID,with_id,R]) 
+
+                        if R != 'punct':
+                            sent.append([ID,with_id,R]) 
+                        
                     else:
                         head = finding[head]
                         if head[0] != 'sentence':
-                            if head[3][5:-2] == 'NN':
+                            if head[3][5:-2] == 'NN' or head[3][5:-2] == 'NNS':
+                                print('pair is NN')
+
                                 ID = self.w2i[word]
                                 with_id = self.w2i[head[1][6:-2]]
-                                sent.append([ID,with_id,R])
+
+                                if R != 'punct':
+                                    sent.append([ID,with_id,R])
                             else:
                                 pass
                         else:
                             pass
+                else:
+                    pass
 
-                elif i == len(finding) - 1:
+                if i == len(finding) - 1:
                     f_vec.append(sent)
-                    vec.append(f_vec)
+                    vec[key-1] = f_vec
+                    print('f_vec:',f_vec)
                     f_vec = []
 
                 else:
                     pass
-        
-        if f_vec != []:
-            vec.append(f_vec)
 
         return vec
 
