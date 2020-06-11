@@ -24,19 +24,24 @@ class Report2vec:
         cnt = 0
         finding = []
 
+        num = 0
+
         for line in lines:
+            num += 1
             lst = [i for i in line.split()]
-            if lst[0] == 'finding':
-                cnt += 1
-                if cnt > 1:
-                    self.findings[cnt-1] = finding
-                    finding = []
-                #########################
-                if cnt == 3:
-                    break
-                #########################
-            else:
-                finding.append(list(l for l in line.split()))
+            try:
+                if lst[0] == 'finding':
+                    cnt += 1
+                    if cnt > 1:
+                        self.findings[cnt-1] = finding
+                        finding = []
+                else:
+                    finding.append(list(l for l in line.split()))
+            except:
+                print('error occured')
+                print(num)
+                print(line)
+                exit()
 
     def word2id(self):
 
@@ -73,17 +78,18 @@ class Report2vec:
 
         for key in self.findings:
 
-            print('key:',key)
+            if key == 1 or key%200 == 0 or key==len(self.findings):
+                print('key:',key)
 
             finding = self.findings[key]
             stored = 0
 
             for i in range(len(finding)):
                 
-                print('finding[i]:',finding[i])
+                #print('finding[i]:',finding[i])
 
                 if 'sentence' in finding[i][0]:
-                    print('sentence found')
+                    #print('sentence found')
 
                     if sent != []:
                         stored = i
@@ -91,7 +97,7 @@ class Report2vec:
                         sent = []
 
                 elif 'Token' in finding[i][0]:
-                    print('Token found')
+                    #print('Token found')
                     index = int(finding[i][0][-2])
                     #print('index:',index)
                     pos = finding[i][3][5:-2]
@@ -99,12 +105,12 @@ class Report2vec:
                     word = finding[i][1][6:-2]
                     #print('word:',word)
                     head = int(finding[i][4][5:-1])+stored
-                    print('head:',head)
+                    #('head:',head)
                     R = finding[i][5][8:-2]
                     #print('R:',R)
 
                     if pos == 'NN' or pos == 'NNS':
-                        print('this is NN')
+                        #print('this is NN')
                         ID = self.w2i[word]
 
                         if 'sentence' in finding[head][0]:
@@ -119,7 +125,7 @@ class Report2vec:
                         head = finding[head]
                         if head[0] != 'sentence':
                             if head[3][5:-2] == 'NN' or head[3][5:-2] == 'NNS':
-                                print('pair is NN')
+                                #print('pair is NN')
 
                                 ID = self.w2i[word]
                                 with_id = self.w2i[head[1][6:-2]]
@@ -136,7 +142,7 @@ class Report2vec:
                 if i == len(finding) - 1:
                     f_vec.append(sent)
                     vec[key-1] = f_vec
-                    print('f_vec:',f_vec)
+                    #print('f_vec:',f_vec)
                     f_vec = []
 
                 else:
@@ -161,13 +167,14 @@ if __name__ == '__main__':
     v = Report2vec("IU_Xray")
 
     v.separate_each_finding()
-    print(v.findings)
+    print('number of findings:',len(v.findings))
+
     v.word2id()
+    '''
     cnt = 0
     for k in v.w2i:
-        if cnt > 10:
-            break
-        print(v.w2i[k])
+        print(cnt+1,k)
         cnt += 1
+    '''
     vec = v.finding2vec()
-    print(vec)
+    print('length of vector:',len(vec))
